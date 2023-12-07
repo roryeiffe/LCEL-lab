@@ -8,7 +8,7 @@ import unittest
 
 from langchain.schema.runnable.base import RunnableSequence
 from langchain.chat_models import AzureChatOpenAI
-from lab.lab import basic_chain, basic_chain_invoke, get_movie_to_actors_chain, get_actors_to_movies_chain
+from lab.lab import get_basic_chain, basic_chain_invoke, get_movie_to_actors_chain, get_actors_to_movies_chain, get_final_chain
 
 
 class TestLLMResponse(unittest.TestCase):
@@ -29,7 +29,7 @@ class TestLLMResponse(unittest.TestCase):
     """
 
     def test_return_type_basic_chain(self):
-        chain = basic_chain()
+        chain = get_basic_chain()
         self.assertIsInstance(chain, RunnableSequence)
     
     def test_return_type_movie_to_actors_chain(self):
@@ -39,15 +39,25 @@ class TestLLMResponse(unittest.TestCase):
     def test_return_type_actors_to_movies_chain(self):
         chain = get_actors_to_movies_chain()
         self.assertIsInstance(chain, RunnableSequence)
+    
+    def test_return_type_final_chain(self):
+        chain = get_final_chain()
+        self.assertIsInstance(chain, RunnableSequence)
 
-    def test_return_type_basic_chain_invoke(self):
-        result = basic_chain_invoke("waterfalls")
-        self.assertIsInstance(result, str)
-
-    def test_basic_chain_invoke(self):
-        result = basic_chain_invoke("honey bee")
+    def test_basic_chain_relevancy(self):
+        result = basic_chain_invoke("honey bees")
         self.assertIsInstance(result, str)
         self.assertTrue(classify_relevancy(result, "Can you tell me about honey bees?"))
+    
+    def test_movies_to_actors_chain_relevancy(self):
+        result = get_movie_to_actors_chain().invoke({"movie": "The Wizard of Oz"})
+        self.assertIsInstance(result, dict)
+        self.assertTrue(classify_relevancy(result, "What actors are in the Wizard of Oz?"))
+
+    def test_final_chain_relevancy(self):
+        result = get_final_chain().invoke({"movie": "The Wizard of Oz"})
+        print(type(result))
+        self.assertTrue(classify_relevancy(result, "What movies share common actors with Wizard of Oz?"))
 
 def classify_relevancy(message, question):
     deployment = os.environ['DEPLOYMENT_NAME']
@@ -59,6 +69,7 @@ def classify_relevancy(message, question):
     if ("yes" in result.content.lower()):
         return True
     else:
+        print(message)
         return False
 
 if __name__ == '__main__':
