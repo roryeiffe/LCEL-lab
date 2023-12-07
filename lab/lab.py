@@ -70,8 +70,15 @@ actor_prompt = """
 # containing movies that share at least 3 common actors (not including the 
 # original movie)
 # Again, make sure to use LCEL to construct the chain
+# To help get you started, some initial code is provided:
 def get_actors_to_movies_chain():
-    chain = None
+    chain = (
+        ChatPromptTemplate.from_messages(
+            [
+                ("human","Which actors are in the following movie."),
+            ]
+        )
+    )
     return chain
 
 # TODO: Finally, this function should return a final chain that links
