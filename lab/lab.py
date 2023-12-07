@@ -53,6 +53,7 @@ actors_output_parser = CommaSeparatedListOutputParser()
 # return a chain that takes in a movie and returns a list of
 # actors who appeared in that movie. 
 # Again, make sure to use LCEL to construct the chain
+# Ensure that the output key is "actors"
 def get_movie_to_actors_chain():
     chain = None
     return chain
